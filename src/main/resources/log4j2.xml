@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        
+        <!-- HTTP Appender for OpenObserve -->
+        <Http name="OpenObserve" url="https://your-openobserve-instance/api/organization_name/stream_name/_json">
+            <Property name="Content-Type" value="application/json"/>
+            <!-- Basic authentication -->
+            <Property name="Authorization" value="Basic ${base64:your_username:your_password}"/>
+            
+            <!-- JSON Layout for structured logging -->
+            <JsonLayout compact="true" eventEol="true" properties="true">
+                <KeyValuePair key="service" value="your-service-name"/>
+            </JsonLayout>
+        </Http>
+        
+        <!-- Async wrapper for OpenObserve appender -->
+        <Async name="AsyncOpenObserve">
+            <AppenderRef ref="OpenObserve"/>
+        </Async>
+    </Appenders>
+    
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncOpenObserve"/>
+        </Root>
+    </Loggers>
+</Configuration>
